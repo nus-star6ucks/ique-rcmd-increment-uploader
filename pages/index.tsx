@@ -1,6 +1,7 @@
 import { Button, Dot, Fieldset, Input, Loading, Text } from "@geist-ui/core";
 import { useRequest } from "ahooks";
 import axios from "axios";
+import { useState } from "react";
 
 function WorkflowStatus() {
   const { data: statusData } = useRequest(
@@ -30,6 +31,20 @@ function WorkflowStatus() {
 }
 
 export default function Main() {
+  const [usersJsonFileInput, setUsersJsonFileInput] = useState<File>();
+  const [reviewJsonFileInput, setReviewJsonFileInput] = useState<File>();
+  const [businessJsonFileInput, setBusinessJsonFileInput] = useState<File>();
+
+  const { loading, run: handleUpload } = useRequest(
+    (file: File) => upload(file),
+    {
+      manual: true,
+      onSuccess(e) {
+        console.log(e);
+      },
+    }
+  );
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="text-center py-4 shadow-lg shadow-neutral-100">
@@ -51,7 +66,10 @@ export default function Main() {
                   htmlType="file"
                   label="users.json"
                   width="100%"
-                  onChange={uploadPhoto}
+                  multiple={false}
+                  onChange={(e) =>
+                    void setUsersJsonFileInput(e.target.files?.[0])
+                  }
                   accept="application/json"
                   placeholder="users.json"
                   required
@@ -60,6 +78,10 @@ export default function Main() {
                   label="review.json"
                   width="100%"
                   htmlType="file"
+                  multiple={false}
+                  onChange={(e) =>
+                    void setReviewJsonFileInput(e.target.files?.[0])
+                  }
                   accept="application/json"
                   placeholder="users.json"
                   required
@@ -67,6 +89,10 @@ export default function Main() {
                 <Input
                   label="business.json"
                   width="100%"
+                  multiple={false}
+                  onChange={(e) =>
+                    void setBusinessJsonFileInput(e.target.files?.[0])
+                  }
                   htmlType="file"
                   accept="application/json"
                   placeholder="users.json"
@@ -74,11 +100,23 @@ export default function Main() {
                 />
               </div>
               <Fieldset.Footer>
-                <span className="space-x-2">
+                <span className="space-x-2 flex items-center">
                   <span>Status:</span>
                   <WorkflowStatus />
                 </span>
-                <Button auto scale={1 / 3} font="12px" type="secondary">
+                <Button
+                  // disabled={[
+                  //   businessJsonFileInput,
+                  //   reviewJsonFileInput,
+                  //   usersJsonFileInput,
+                  // ].includes(undefined)}
+                  loading={loading}
+                  onClick={() => void handleUpload(businessJsonFileInput)}
+                  auto
+                  scale={1 / 3}
+                  font="12px"
+                  type="secondary"
+                >
                   Upload & Trigger
                 </Button>
               </Fieldset.Footer>
@@ -99,9 +137,8 @@ export default function Main() {
   );
 }
 
-const uploadPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0]!;
-  const filename = encodeURIComponent(file.name);
+const upload = async (file: File) => {
+  const filename = Date.now();
   const fileType = encodeURIComponent(file.type);
 
   const res = await fetch(

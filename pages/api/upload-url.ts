@@ -9,6 +9,7 @@ export default async function handler(
     apiVersion: '2006-03-01',
   })
 
+
   const post = await s3.createPresignedPost({
     Bucket: process.env.BUCKET_NAME,
     Fields: {
@@ -17,7 +18,7 @@ export default async function handler(
     },
     Expires: 60, // seconds
     Conditions: [
-      ['content-length-range', 0, 1048576], // up to 1 MB
+      ['content-length-range', 0, 1048576 * 2048], // up to 2 GB
     ],
   })
 

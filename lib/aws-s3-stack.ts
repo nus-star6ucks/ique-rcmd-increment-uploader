@@ -7,7 +7,7 @@ export class AwsS3Stack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props)
 
-    const bucket = new s3.Bucket(this, 'my-bucket', {
+    const bucket = new s3.Bucket(this, 'ique-processing', {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       cors: [
         {
