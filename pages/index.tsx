@@ -10,9 +10,8 @@ import {
 import { useRequest } from "ahooks";
 import axios from "axios";
 import { useState } from "react";
-import { runNewDataIncoming } from "../lib/utils";
 
-function WorkflowStatus() {
+function Footer({ children }) {
   const { data: statusData } = useRequest(
     () => axios.get("/api/databricks-workflow-status"),
     {
@@ -20,22 +19,28 @@ function WorkflowStatus() {
     }
   );
 
-  if (!statusData) {
-    return <Loading />;
-  }
-
-  if (!statusData.data.isActive) {
-    return (
-      <Dot type="error">
-        <span className="text-sm">Busy</span>
-      </Dot>
-    );
-  }
-
   return (
-    <Dot type="success">
-      <span className="text-sm">Ready</span>
-    </Dot>
+    <>
+      {statusData ? (
+        <span className="space-x-2 flex items-center">
+          <span>Status:</span>
+          {!statusData.data.isActive ? (
+            <Dot type="error">
+              <span className="text-sm">Busy</span>
+            </Dot>
+          ) : (
+            <Dot type="success">
+              <span className="text-sm">Ready</span>
+            </Dot>
+          )}
+        </span>
+      ) : (
+        <span>
+          <Loading />
+        </span>
+      )}
+      {children}
+    </>
   );
 }
 
@@ -107,20 +112,23 @@ export default function Main() {
                 />
               </div>
               <Fieldset.Footer>
-                <span className="space-x-2 flex items-center">
-                  <span>Status:</span>
-                  <WorkflowStatus />
-                </span>
-                <Button
-                  loading={loading}
-                  onClick={() => void handleUpload(datasetZipFileInput)}
-                  auto
-                  scale={1 / 3}
-                  font="12px"
-                  type="secondary"
-                >
-                  Upload & Trigger
-                </Button>
+                <Footer>
+                  <Button
+                    loading={loading}
+                    disabled={!datasetZipFileInput}
+                    onClick={() =>
+                      window.confirm(
+                        "Please ensure that filenames in zip are correct, are you sure?"
+                      ) && handleUpload(datasetZipFileInput)
+                    }
+                    auto
+                    scale={1 / 3}
+                    font="12px"
+                    type="secondary"
+                  >
+                    Upload & Trigger
+                  </Button>
+                </Footer>
               </Fieldset.Footer>
             </Fieldset>
           </Fieldset.Group>
