@@ -9,6 +9,7 @@ import {
 } from "@geist-ui/core";
 import { useRequest } from "ahooks";
 import axios from "axios";
+import Head from "next/head";
 import { useState } from "react";
 
 function Footer({ children }) {
@@ -81,6 +82,9 @@ export default function Main() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Head>
+        <title>iQue Recommendation Uploader</title>
+      </Head>
       <header className="text-center py-4 shadow-lg shadow-neutral-100">
         <Text className="m-0 p-0" h4>
           iQue Recommendation Uploader
