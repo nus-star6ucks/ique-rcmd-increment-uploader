@@ -11,7 +11,7 @@ export default async function handler(
             msg: 'Incorrect format',
         })
     }
-    const { data } = await runNewDataIncoming({ incoming_dataset_zip_filename: req.query.zipFilename })
+    const { data } = await runNewDataIncoming({ incoming_dataset_zip_filename: req.body.zipFilename })
     res.status(200).json({
         success: true,
         msg: 'ok',

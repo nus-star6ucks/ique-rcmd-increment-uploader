@@ -12,7 +12,7 @@ const databricksInstance = axios.create({
 export const dbListRunsForAJob = (activeOnly = true, ...params) => databricksInstance.get('/2.1/jobs/runs/list', {
     params: {
         active_only: activeOnly,
-        job_id: DATABRICKS_NEW_DATA_INCOMING_JOB_ID,
+        job_id: process.env.DATABRICKS_NEW_DATA_INCOMING_JOB_ID,
         ...params
     }
 })
