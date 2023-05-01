@@ -5,14 +5,16 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
-    if (!req.query.zipFilename) {
+    if (!req.body.zipFilename) {
         return res.status(200).json({
-            success: false
+            success: false,
+            msg: 'Incorrect format',
         })
     }
     const { data } = await runNewDataIncoming({ incoming_dataset_zip_filename: req.query.zipFilename })
     res.status(200).json({
         success: true,
+        msg: 'ok',
         data: { ...data }
     })
 }

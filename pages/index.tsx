@@ -52,7 +52,14 @@ export default function Main() {
       ),
     {
       manual: true,
-      onSuccess(e) {
+      onSuccess({ data: { success, msg } }) {
+        if (!success) {
+          setToast({
+            text: msg,
+            type: "error",
+          });
+          return;
+        }
         setToast({
           text: "Uploaded and triggered successfully!",
           type: "success",
