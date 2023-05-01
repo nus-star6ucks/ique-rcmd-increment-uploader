@@ -51,7 +51,7 @@ export default function Main() {
   const { loading, run: handleUpload } = useRequest(
     (file: File) =>
       upload(file).then((filename) =>
-        axios.post("/api/trigger-new-data-incoming-run", {
+        axios.post("api/trigger-new-data-incoming-run", {
           zipFilename: filename,
         })
       ),
@@ -143,7 +143,7 @@ const upload = async (file: File) => {
   const fileType = encodeURIComponent(file.type);
 
   const res = await fetch(
-    `/api/upload-url?file=${filename}&fileType=${fileType}`
+    `api/upload-url?file=${filename}&fileType=${fileType}`
   );
   const { url, fields } = await res.json();
   const formData = new FormData();
