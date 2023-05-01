@@ -116,15 +116,6 @@ export default function Main() {
                 </Button>
               </Fieldset.Footer>
             </Fieldset>
-            <Fieldset label="status">
-              <Fieldset.Title>HTTP is extensible</Fieldset.Title>
-              <Fieldset.Subtitle>Workflow Status:</Fieldset.Subtitle>
-              <Fieldset.Footer>
-                <Button auto scale={1 / 3} font="12px">
-                  Actions
-                </Button>
-              </Fieldset.Footer>
-            </Fieldset>
           </Fieldset.Group>
         </div>
       </main>
