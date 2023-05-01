@@ -16,3 +16,12 @@ export const dbListRunsForAJob = (activeOnly = true, ...params) => databricksIns
         ...params
     }
 })
+
+export const runAWorkflow = (jobId: string, params) => databricksInstance.post('/2.1/jobs/run-now', {
+    job_id: jobId,
+    notebook_params: {
+        ...params
+    }
+})
+
+export const runNewDataIncoming = (params) => runAWorkflow(process.env.DATABRICKS_NEW_DATA_INCOMING_JOB_ID, params)

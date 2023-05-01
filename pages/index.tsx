@@ -1,7 +1,16 @@
-import { Button, Dot, Fieldset, Input, Loading, Text } from "@geist-ui/core";
+import {
+  Button,
+  Dot,
+  Fieldset,
+  Input,
+  Loading,
+  Text,
+  useToasts,
+} from "@geist-ui/core";
 import { useRequest } from "ahooks";
 import axios from "axios";
 import { useState } from "react";
+import { runNewDataIncoming } from "../lib/utils";
 
 function WorkflowStatus() {
   const { data: statusData } = useRequest(
@@ -25,22 +34,35 @@ function WorkflowStatus() {
 
   return (
     <Dot type="success">
-      <span className="text-sm -ml-1">Ready to Run</span>
+      <span className="text-sm">Ready</span>
     </Dot>
   );
 }
 
 export default function Main() {
-  const [usersJsonFileInput, setUsersJsonFileInput] = useState<File>();
-  const [reviewJsonFileInput, setReviewJsonFileInput] = useState<File>();
-  const [businessJsonFileInput, setBusinessJsonFileInput] = useState<File>();
+  const [datasetZipFileInput, setDatasetZipFileInput] = useState<File>();
 
+  const { setToast } = useToasts();
   const { loading, run: handleUpload } = useRequest(
-    (file: File) => upload(file),
+    (file: File) =>
+      upload(file).then((filename) =>
+        axios.post("/api/trigger-new-data-incoming-run", {
+          zipFilename: filename,
+        })
+      ),
     {
       manual: true,
       onSuccess(e) {
-        console.log(e);
+        setToast({
+          text: "Uploaded and triggered successfully!",
+          type: "success",
+        });
+      },
+      onError(e) {
+        setToast({
+          text: e.message,
+          type: "error",
+        });
       },
     }
   );
@@ -59,43 +81,21 @@ export default function Main() {
               <Fieldset.Title>Upload incremental datasets</Fieldset.Title>
               <Fieldset.Subtitle>
                 Databricks workflow will be triggered when upload process is
-                completed.
+                completed. A single zip includes 3 json files:{" "}
+                <code>business.json</code>, <code>review.json</code>,{" "}
+                <code>user.json</code>.
               </Fieldset.Subtitle>
               <div className="space-y-4">
                 <Input
                   htmlType="file"
-                  label="users.json"
+                  label="dataset.zip"
                   width="100%"
                   multiple={false}
                   onChange={(e) =>
-                    void setUsersJsonFileInput(e.target.files?.[0])
+                    void setDatasetZipFileInput(e.target.files?.[0])
                   }
-                  accept="application/json"
-                  placeholder="users.json"
-                  required
-                />
-                <Input
-                  label="review.json"
-                  width="100%"
-                  htmlType="file"
-                  multiple={false}
-                  onChange={(e) =>
-                    void setReviewJsonFileInput(e.target.files?.[0])
-                  }
-                  accept="application/json"
-                  placeholder="users.json"
-                  required
-                />
-                <Input
-                  label="business.json"
-                  width="100%"
-                  multiple={false}
-                  onChange={(e) =>
-                    void setBusinessJsonFileInput(e.target.files?.[0])
-                  }
-                  htmlType="file"
-                  accept="application/json"
-                  placeholder="users.json"
+                  accept="application/zip"
+                  placeholder="dataset.zip"
                   required
                 />
               </div>
@@ -105,13 +105,8 @@ export default function Main() {
                   <WorkflowStatus />
                 </span>
                 <Button
-                  // disabled={[
-                  //   businessJsonFileInput,
-                  //   reviewJsonFileInput,
-                  //   usersJsonFileInput,
-                  // ].includes(undefined)}
                   loading={loading}
-                  onClick={() => void handleUpload(businessJsonFileInput)}
+                  onClick={() => void handleUpload(datasetZipFileInput)}
                   auto
                   scale={1 / 3}
                   font="12px"
@@ -157,8 +152,8 @@ const upload = async (file: File) => {
   });
 
   if (upload.ok) {
-    console.log("Uploaded successfully!");
+    return filename;
   } else {
-    console.error("Upload failed.");
+    throw new Error("Upload failed.");
   }
 };
