@@ -14,7 +14,7 @@ import { useState } from "react";
 
 function Footer({ children }) {
   const { data: statusData } = useRequest(
-    () => axios.get("/api/databricks-workflow-status"),
+    () => axios.get("api/databricks-workflow-status"),
     {
       pollingInterval: 1000,
     }
